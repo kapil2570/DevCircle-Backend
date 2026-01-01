@@ -1,0 +1,21 @@
+{
+  "name": "devtinder---backend",
+  "version": "1.0.0",
+  "description": "Tinder for Devs",
+  "main": "index.js",
+  "scripts": {
+    "start" : "node src/app",
+    "dev" : "nodemon src/app"
+  },
+  "keywords": [
+    "NodeJs",
+    "JavaScript",
+    "Backend",
+    "WebDev"
+  ],
+  "author": "Kapil Sahu",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
