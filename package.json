@@ -4,8 +4,8 @@
   "description": "Tinder for Devs",
   "main": "index.js",
   "scripts": {
-    "start" : "node src/app",
-    "dev" : "nodemon src/app"
+    "start": "node src/app",
+    "dev": "nodemon src/app"
   },
   "keywords": [
     "NodeJs",
@@ -16,6 +16,7 @@
   "author": "Kapil Sahu",
   "license": "ISC",
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "mongoose": "^9.1.1"
   }
 }
