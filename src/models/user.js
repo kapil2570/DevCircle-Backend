@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
     firstName: {
@@ -69,5 +71,22 @@ const userSchema = new mongoose.Schema({
     timestamps: true
 }
 )
+
+// Arrow function won't work as 'this' works differently
+userSchema.methods.generateJWT = async function() {
+    const user = this;
+    const token = await jwt.sign({ _id: user._id }, "DevTinder@KapilNode9236", { expiresIn: "7d" });
+    return token;
+}
+
+
+// Arrow function won't work as 'this' works differently
+userSchema.methods.validatePassword = async function(passwordInput) {
+    const user = this;
+    const passwordHash = user.password;
+    const isPasswordValid = await bcrypt.compare(passwordInput, passwordHash);
+
+    return isPasswordValid;
+}
 
 module.exports = mongoose.model("User", userSchema);
