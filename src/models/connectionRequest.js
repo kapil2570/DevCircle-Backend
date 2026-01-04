@@ -3,16 +3,18 @@ const mongoose = require('mongoose');
 const connectionRequestSchema = new mongoose.Schema({
     fromUserId: {
         type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
         required: true
     },
     toUserId: {
         type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
         required: true,
     },
     status: {
         type: String,
         enum: {
-            values: ["ignored", "interested", "accpeted", "rejected"],
+            values: ["ignored", "interested", "accepted", "rejected"],
             message: `{VALUE} is invalid status type`
         },
         required: true
@@ -21,6 +23,8 @@ const connectionRequestSchema = new mongoose.Schema({
 {
     timestamps: true
 });
+
+connectionRequestSchema.index({ fromUserId: 1, toUserId: 1 });
 
 // Arrow function won't work
 connectionRequestSchema.pre("save", function (next) {
