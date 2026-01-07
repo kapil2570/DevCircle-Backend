@@ -53,7 +53,7 @@ const userSchema = new mongoose.Schema({
     },
     photoUrl: {
         type: String,
-        default: "https://commons.wikimedia.org/wiki/File:Sample_User_Icon.png",
+        default: "https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png?20200919003010",
         validate(val) {
             if(!validator.isURL(val))
                 throw new Error("Invalid Photo URL");
