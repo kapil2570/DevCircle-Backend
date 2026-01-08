@@ -3,6 +3,9 @@ const { userAuth } = require("../middlewares/auth");
 const { validateProfileEdit } = require("../utils/validation");
 const validator = require('validator');
 const bcrypt = require('bcrypt');
+const upload = require('../middlewares/upload');
+const cloudinary = require('../config/cloudinary');
+const fs = require('fs');
 
 const profileRouter = express.Router();
 
@@ -11,7 +14,7 @@ profileRouter.get("/profile/view", userAuth, async (req, res) => {
     const user = req.user;
     res.send(user);
   } catch (err) {
-    res.status(400).send("ERROR: " + err.message);
+    res.status(400).send({message: "ERROR: " + err.message});
   }
 });
 
@@ -30,7 +33,40 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
         res.json({ message: `${loggedInUser.firstName}, your profile is updated successfully`, data: loggedInUser })
 
     } catch(err) {
-        res.status(400).send("ERROR: " + err.message);
+        res.status(400).send({message: "ERROR: " + err.message});
+    }
+})
+
+profileRouter.patch("/profile/upload-photo", userAuth, upload.single("photo"), async (req,res) => {
+    try {
+        if(!req.file) {
+            throw new Error("No file uploaded");
+        }
+        // const loggedInUser = req.user;
+
+        // Upload the local file to cloudinary
+        const result = await cloudinary.v2.uploader.upload(
+            req.file.path,
+            {
+                folder: 'profiles'
+            }
+        );
+
+        // Update photoUrl in DB
+        // loggedInUser.photoUrl = result.secure_url;
+        // await loggedInUser.save();
+
+        // Delete the local file
+        fs.unlinkSync(req.file.path);
+
+        res.json({
+            message: "Profile photo updated successfully",
+            photoUrl: result.secure_url
+        });
+
+    } catch(err) {
+        fs.unlinkSync(req.file.path);
+        res.status(400).send({ message: "ERROR: " + err.message });
     }
 })
 
@@ -60,9 +96,9 @@ profileRouter.patch("/profile/updatePassword", userAuth, async (req, res) => {
         loggedInUser["password"] = newPasswordHash;
         await loggedInUser.save();
 
-        res.send("Password updated successfully");
+        res.send({message: "Password updated successfully"});
     } catch(err) {
-        res.status(400).send("ERROR: " + err.message);
+        res.status(400).send({message: "ERROR: " + err.message});
     }
     
 })
