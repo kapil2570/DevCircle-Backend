@@ -13,6 +13,12 @@ authRouter.post("/signup", async (req, res) => {
     //Validation of the data
     validateSignUpData(req);
 
+    //Check for Existing User with this Email ID
+    const existingUser = await User.findOne({ emailId });
+    if(existingUser) {
+      throw new Error("Email ID is already registered, Please login");
+    }
+
     //Encrypting the password
     const passwordHash = await bcrypt.hash(password, 10);
 
@@ -25,9 +31,9 @@ authRouter.post("/signup", async (req, res) => {
     });
 
     await user.save();
-    res.send("User Created Successfully");
+    res.send({message: "User Created Successfully"});
   } catch (err) {
-    res.status(400).send("ERROR: " + err.message);
+    res.status(400).send({message: "ERROR: " + err.message});
   }
 });
 

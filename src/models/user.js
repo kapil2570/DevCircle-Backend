@@ -69,6 +69,22 @@ const userSchema = new mongoose.Schema({
             if(val.length > 10)
                 throw new Error("Maximum 10 skills are allowed")
         }
+    },
+    experience: {
+        type: String,
+        validate(val) {
+            if(val.length > 400) {
+                throw new Error("Max 400 characters are allowed in experience field");
+            }
+        }
+    },
+    careerGoals: {
+        type: String,
+        validate(val) {
+            if(val.length > 250) {
+                throw new Error("Max 250 characters are allowed in career goals field");
+            }
+        }
     }
 },
 {
