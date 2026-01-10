@@ -74,7 +74,15 @@ profileRouter.patch("/profile/updatePassword", userAuth, async (req, res) => {
     try {
         // Validate current password
         const loggedInUser = req.user;
-        const { currentPassword: currentPasswordInput, newPassword: newPasswordInput } = req.body;
+        const { currentPassword: currentPasswordInput, newPassword: newPasswordInput, confirmPassword: confirmPasswordInput } = req.body;
+
+        if(!currentPasswordInput || !newPasswordInput || !confirmPasswordInput) {
+            throw new Error("All the fields are required");
+        }
+
+        if(newPasswordInput.trim() !== confirmPasswordInput.trim()) {
+            throw new Error("New password and confirm password are not the same");
+        }
 
         const isCurrentPasswordValid = await loggedInUser.validatePassword(currentPasswordInput);
         if(!isCurrentPasswordValid) {
