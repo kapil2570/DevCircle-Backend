@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt');
 const upload = require('../middlewares/upload');
 const cloudinary = require('../config/cloudinary');
 const fs = require('fs');
+const uploadMiddleware = require('../middlewares/upload');
 
 const profileRouter = express.Router();
 
@@ -37,12 +38,11 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
     }
 })
 
-profileRouter.patch("/profile/upload-photo", userAuth, upload.single("photo"), async (req,res) => {
+profileRouter.patch("/profile/upload-photo", userAuth, uploadMiddleware, async (req,res) => {
     try {
         if(!req.file) {
             throw new Error("No file uploaded");
         }
-        // const loggedInUser = req.user;
 
         // Upload the local file to cloudinary
         const result = await cloudinary.v2.uploader.upload(
@@ -51,10 +51,6 @@ profileRouter.patch("/profile/upload-photo", userAuth, upload.single("photo"), a
                 folder: 'profiles'
             }
         );
-
-        // Update photoUrl in DB
-        // loggedInUser.photoUrl = result.secure_url;
-        // await loggedInUser.save();
 
         // Delete the local file
         fs.unlinkSync(req.file.path);

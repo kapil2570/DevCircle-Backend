@@ -15,7 +15,23 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({
-    storage
+    storage,
+    limits: {
+        fileSize: 10*1024*1024
+    }
 });
 
-module.exports = upload;
+const uploadMiddleware = (req, res, next) => {
+    upload.single("photo")(req, res, function (err) {
+        if(err instanceof multer.MulterError) {
+            return res.status(413).send("File too large, Max size is 10MB");
+        } else if(err) {
+            return res.status(400).json({
+                message: err.message
+            })
+        }
+        next();
+    });
+}
+
+module.exports = uploadMiddleware;
