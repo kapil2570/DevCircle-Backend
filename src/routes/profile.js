@@ -48,8 +48,10 @@ profileRouter.patch("/profile/upload-photo", userAuth, uploadMiddleware, async (
         const result = await cloudinary.v2.uploader.upload(
             req.file.path,
             {
-                folder: 'profiles'
-            }
+                folder: 'profiles',
+                quality: "auto",
+                fetch_format: "auto"
+            },
         );
 
         // Delete the local file
