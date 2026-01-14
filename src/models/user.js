@@ -95,7 +95,7 @@ const userSchema = new mongoose.Schema({
 // Arrow function won't work as 'this' works differently
 userSchema.methods.generateJWT = async function() {
     const user = this;
-    const token = await jwt.sign({ _id: user._id }, "DevTinder@KapilNode9236", { expiresIn: "7d" });
+    const token = await jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
     return token;
 }
 
