@@ -5,6 +5,8 @@ const bcrypt = require("bcrypt");
 
 const authRouter = express.Router();
 
+const isProduction = process.env.NODE_ENV === "production";
+
 authRouter.post("/signup", async (req, res) => {
   try {
     const { firstName, lastName, emailId, password } = req.body;
@@ -33,8 +35,13 @@ authRouter.post("/signup", async (req, res) => {
 
     const token = await userData.generateJWT();
     res.cookie("token", token, {
-      expires: new Date(Date.now() + 8 * 3600000), // cookie will be removed after 8 hours
-    });
+        expires: new Date(Date.now() + 8 * 3600000), // cookie will be removed after 8 hours
+        httpOnly: true,
+        secure: isProduction, // true on prod (HTTPS), false on local (HTTP)
+        sameSite: isProduction ? "None" : "Lax",
+        // Only set domain if in production
+        ...(isProduction && { domain: ".devcircle.co.in" }),
+      });
     res.send({
       message: "User Created Successfully",
       data: userData,
@@ -58,9 +65,10 @@ authRouter.post("/login", async (req, res) => {
       res.cookie("token", token, {
         expires: new Date(Date.now() + 8 * 3600000), // cookie will be removed after 8 hours
         httpOnly: true,
-        secure: true, // Must be true for HTTPS
-        sameSite: "None", // Required for cross-origin if frontend is separate
-        domain: ".devcircle.co.in", // Leading dot allows subdomains
+        secure: isProduction, // true on prod (HTTPS), false on local (HTTP)
+        sameSite: isProduction ? "None" : "Lax",
+        // Only set domain if in production
+        ...(isProduction && { domain: ".devcircle.co.in" }),
       });
       res.json({
         message: "Login Successful",
