@@ -1,3 +1,4 @@
+const Server = require("socket.io");
 const socket = require("socket.io");
 const { Message } = require("../models/chat");
 const { socketAuth } = require("../middlewares/socketAuth");
@@ -5,11 +6,19 @@ const { socketAuth } = require("../middlewares/socketAuth");
 const onlineUsers = new Map();
 
 const initializeSocket = (server) => {
-  const io = socket(server, {
+  // const io = socket(server, {
+  //   cors: {
+  //     origin: process.env.CLIENT_URL,
+  //     credentials: true,
+  //   },
+  // });
+
+  const io =  Server(server, {
     cors: {
-      origin: process.env.CLIENT_URL,
-      credentials: true,
+      origin: ["https://devcircle.co.in", "http://localhost:5173"],
+      credentials: true
     },
+    path: "/socket.io"
   });
 
   io.use(socketAuth);
