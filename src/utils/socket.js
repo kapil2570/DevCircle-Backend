@@ -13,17 +13,16 @@ const initializeSocket = (server) => {
   //   },
   // });
 
-  const io =  Server(server, {
+  const io = Server(server, {
     cors: {
       origin: ["https://devcircle.co.in", "http://localhost:5173"],
-      credentials: true
+      credentials: true,
     },
-    path: "/socket.io"
+    path: "/socket.io",
   });
 
   io.use(socketAuth);
 
-  
   io.on("connection", (socket) => {
     const userId = socket.user._id.toString();
     socket.on("registerUser", () => {
@@ -50,12 +49,27 @@ const initializeSocket = (server) => {
     });
 
     socket.on("disconnect", () => {
-      const sockets = onlineUsers.get(userId);
-      sockets.delete(socket.id);
+      // const sockets = onlineUsers.get(userId);
+      // sockets.delete(socket.id);
 
-      if (sockets.size === 0) {
-        onlineUsers.delete(userId);
-        io.emit("userOffline", { userId });
+      // if (sockets.size === 0) {
+      //   onlineUsers.delete(userId);
+      //   io.emit("userOffline", { userId });
+      // }
+
+      for (let [userId, sockets] of onlineUsers.entries()) {
+        if (!sockets) continue;
+
+        if (sockets.has(socket.id)) {
+          sockets.delete(socket.id);
+
+          if (sockets.size === 0) {
+            onlineUsers.delete(userId);
+            io.emit("userOffline", { userId });
+          }
+
+          break;
+        }
       }
     });
   });

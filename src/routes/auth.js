@@ -36,9 +36,9 @@ authRouter.post("/signup", async (req, res) => {
       expires: new Date(Date.now() + 8 * 3600000), // cookie will be removed after 8 hours
     });
     res.send({
-      message: 'User Created Successfully',
-      data: userData
-    })
+      message: "User Created Successfully",
+      data: userData,
+    });
   } catch (err) {
     res.status(400).send({ message: "ERROR: " + err.message });
   }
@@ -57,6 +57,10 @@ authRouter.post("/login", async (req, res) => {
       const token = await user.generateJWT();
       res.cookie("token", token, {
         expires: new Date(Date.now() + 8 * 3600000), // cookie will be removed after 8 hours
+        httpOnly: true,
+        secure: true, // Must be true for HTTPS
+        sameSite: "None", // Required for cross-origin if frontend is separate
+        domain: ".devcircle.co.in", // Leading dot allows subdomains
       });
       res.json({
         message: "Login Successful",
