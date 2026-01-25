@@ -25,13 +25,11 @@ const initializeSocket = (server) => {
 
   io.on("connection", (socket) => {
     const userId = socket.user._id.toString();
-    socket.on("registerUser", () => {
-      if (!onlineUsers.has(userId)) {
-        onlineUsers.set(userId, new Set());
-      }
-      onlineUsers.get(userId).add(socket.id);
-      io.emit("userOnline", { userId });
-    });
+    if (!onlineUsers.has(userId)) {
+      onlineUsers.set(userId, new Set());
+    }
+    onlineUsers.get(userId).add(socket.id);
+    io.emit("userOnline", { userId });
 
     socket.on("joinChat", ({ chatId }) => {
       socket.join(chatId);
@@ -49,14 +47,6 @@ const initializeSocket = (server) => {
     });
 
     socket.on("disconnect", () => {
-      // const sockets = onlineUsers.get(userId);
-      // sockets.delete(socket.id);
-
-      // if (sockets.size === 0) {
-      //   onlineUsers.delete(userId);
-      //   io.emit("userOffline", { userId });
-      // }
-
       for (let [userId, sockets] of onlineUsers.entries()) {
         if (!sockets) continue;
 
