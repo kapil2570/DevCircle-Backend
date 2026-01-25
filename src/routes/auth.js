@@ -84,7 +84,14 @@ authRouter.post("/login", async (req, res) => {
 
 authRouter.post("/logout", async (req, res) => {
   try {
-    res.cookie("token", null, { expires: new Date(Date.now()) });
+    res.cookie("token", null, { 
+      expires: new Date(Date.now()),
+      httpOnly: true,
+        secure: isProduction, // true on prod (HTTPS), false on local (HTTP)
+        sameSite: isProduction ? "None" : "Lax",
+        // Only set domain if in production
+        ...(isProduction && { domain: ".devcircle.co.in" }) 
+    });
     res.send({ message: "Logout Successful" });
   } catch (err) {
     res.status(400).send("ERROR: ", +err.message);
