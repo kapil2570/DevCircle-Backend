@@ -28,6 +28,7 @@ userRouter.get("/user/requests/received", userAuth, async (req, res) => {
 userRouter.get("/user/connections", userAuth, async (req,res) => {
     try {
         const loggedInUser = req.user;
+        console.log(loggedInUser._id);
         const connections = await ConnectionRequest.find(
             { $or:[{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }], status: "accepted" }
         ).populate("fromUserId", USER_SAFE_DATA)

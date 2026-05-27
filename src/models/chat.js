@@ -20,6 +20,8 @@ const messageSchema = new mongoose.Schema({
     timestamps: true
 });
 
+messageSchema.index({ chatId: 1, createdAt: 1 })
+
 
 const chatModel = new mongoose.model("Chat", chatSchema);
 const messageModel = new mongoose.model("Message", messageSchema);
