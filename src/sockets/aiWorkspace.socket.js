@@ -1,3 +1,4 @@
+const { generateResponse } = require('../config/gemini');
 const { AIWorkspace, AIMessage } = require('../models/aiWorkspace');
 
 const initializeWorkspaceSocket = (io, socket) => {
@@ -52,7 +53,87 @@ const initializeWorkspaceSocket = (io, socket) => {
       console.log(err.message || "Something went wrong");
     }
 
-  })
+  });
+
+
+  socket.on("submitPrompt", async ({ workspaceId, prompt }) => {
+    try {
+      
+      if(!prompt?.trim()) return;
+      
+      if(socket.currentWorkspaceId !== workspaceId) {
+        return socket.emit("workspaceError", {
+          message: "You don't have access to this workspace"
+        });
+      }
+
+      let aiWorkspace = await AIWorkspace.findById(workspaceId);
+      if(aiWorkspace.isGenerating) {
+        return socket.emit("workspaceError", {
+          message: "AI is already generating a response"
+        });
+      }
+
+      let newMessage = new AIMessage({
+        workspaceId,
+        senderRole: "user",
+        senderId: loggedInUserId,
+        content: prompt
+      });
+
+      const savedPrompt = await newMessage.save();
+
+      io.to(workspaceId).emit("promptFinalized", {
+        message: savedPrompt
+      });
+
+      aiWorkspace.currentDraft = {
+        text: "",
+        updatedBy: null
+      };
+      aiWorkspace.isGenerating = true;
+
+      await aiWorkspace.save();
+
+      const messages = await AIMessage.find({ workspaceId }).sort({ messageSentAt: -1 }).limit(10);
+      messages.reverse();
+
+      const geminiMessages = messages.map((message) => ({
+        role: message.senderRole === "assistant" ? "model" : "user",
+        parts: [ { text: message.content } ]
+      }));
+
+      io.to(workspaceId).emit("aiGenerating", {
+        isGenerating : true,
+        submittedBy: loggedInUserId
+      });
+
+      try {
+        const response = await generateResponse(geminiMessages);
+
+        if(response) {
+        const newMessage = new AIMessage({
+          workspaceId,
+          senderRole: "assistant",
+          senderId: null,
+          content: response
+        });
+        const savedResponse = await newMessage.save();
+
+        io.to(workspaceId).emit("responseGenerated", {
+        message: savedResponse
+      })
+        }
+      } catch(err) {
+        return io.to(workspaceId).emit("aiGenerationError", { message: err.message });
+      } finally {
+        await AIWorkspace.findByIdAndUpdate(workspaceId, { isGenerating: false });
+      }
+
+    } catch (err) {
+      console.log(err.message || "Something went wrong");
+    }
+  });
 
 };
 

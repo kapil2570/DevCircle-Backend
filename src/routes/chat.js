@@ -3,6 +3,7 @@ const { userAuth } = require("../middlewares/auth");
 const { Chat, Message } = require("../models/chat");
 const ConnectionRequest = require("../models/connectionRequest");
 const { onlineUsers } = require('../sockets/onlineUsers');
+const { AIWorkspace } = require("../models/aiWorkspace");
 
 const chatRouter = express.Router();
 
@@ -36,7 +37,13 @@ chatRouter.post("/chat/start/:targetUserId", userAuth, async (req, res) => {
         participants: [loggedInUserId, targetUserId],
       });
 
+      aiWorkspace = new AIWorkspace({
+        _id: chat._id,
+        participants: chat.participants,
+      })
+
       await chat.save();
+      await aiWorkspace.save();
     }
     res.json({ message: "Retrieved Chat ID Successfully", data: { chatId: chat._id } });
   } catch (err) {

@@ -23,6 +23,7 @@
 ## Backend -> Frontend Events
 - workspaceStateSynced  : { currentPromptDraft,  isGenerating, allMessages}
 - promptSynced : { text, updatedBy }
+- promptFinalized : { message }
 - aiGenerating  : { isGenerating: true, submittedBy }
 - responseGenerated : { promptMessage, aiMessage }
 - generationFailed : { error }
