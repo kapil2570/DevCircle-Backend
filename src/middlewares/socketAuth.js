@@ -4,6 +4,7 @@ const User = require("../models/user");
 const socketAuth = async (socket, next) => {
     try {
         const cookie = socket.handshake.headers.cookie;
+        console.log('socket cookie: ', cookie);
         if(!cookie) {
             return next(new Error("Cookie not sent"));
         }

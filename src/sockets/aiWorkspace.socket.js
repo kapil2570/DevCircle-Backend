@@ -46,7 +46,7 @@ const initializeWorkspaceSocket = (io, socket) => {
       aiWorkspace.currentDraft.text = text;
       aiWorkspace.currentDraft.updatedBy = loggedInUserId;
       const updatedAIWorkspace = await aiWorkspace.save();
-
+      console.log('updatedAIWorkspace', updatedAIWorkspace);
       io.to(workspaceId).emit("promptSynced", { text: updatedAIWorkspace.currentDraft.text, updatedBy: updatedAIWorkspace.currentDraft.updatedBy })
 
     } catch (err) {
