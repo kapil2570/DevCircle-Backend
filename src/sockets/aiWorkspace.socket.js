@@ -37,6 +37,8 @@ const initializeWorkspaceSocket = (io, socket) => {
 
     try {
 
+      if(!socket.currentWorkspaceId) return;
+
       if(socket.currentWorkspaceId !== workspaceId) {
         return socket.emit("workspaceError", {
           message: "You don't have access to this workspace"
