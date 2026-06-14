@@ -1,4 +1,5 @@
 const { generateResponse } = require('../config/gemini');
+const { AIUsage } = require('../models/aiUsage');
 const { AIWorkspace, AIMessage } = require('../models/aiWorkspace');
 
 const initializeWorkspaceSocket = (io, socket) => {
@@ -59,6 +60,13 @@ const initializeWorkspaceSocket = (io, socket) => {
     try {
       
       if(!prompt?.trim()) return;
+
+      if(prompt.length > 5000) {
+        return socket.emit("workspaceError", {
+          type: "promptSizeExceededLimit",
+          message: "Prompt size cannot be more than 5000"
+        })
+      }
       
       if(socket.currentWorkspaceId !== workspaceId) {
         return socket.emit("workspaceError", {
@@ -73,6 +81,34 @@ const initializeWorkspaceSocket = (io, socket) => {
         });
       }
 
+      let aiUsage = await AIUsage.findOne({ workspace: workspaceId });
+      if(!aiUsage) {
+        aiUsage = await AIUsage.create({
+          workspace: workspaceId,
+          count: 0,
+          lastPromptSentAt: new Date()
+        });
+        await aiUsage.save();
+      }
+
+      const today = new Date();
+      if(aiUsage.lastPromptSentAt.toDateString() !== today.toDateString()) {
+        aiUsage.lastPromptSentAt = today;
+        aiUsage.count = 0;
+        await aiUsage.save();
+      } else if(aiUsage.count >= 10) {
+        return socket.emit("workspaceError", {
+          type: "promptLimitReached",
+          message: "You've used all your daily AI credits! Your quota resets tomorrow."
+        })
+      };
+
+      if(aiUsage.lastPromptSentAt && (Date.now() - aiUsage.lastPromptSentAt.getTime()) < 10000) {
+        return socket.emit("workspaceError", {
+          type: "generationCooldown",
+          message: `Please wait ${Math.trunc((10000 - (Date.now() - aiUsage.lastPromptSentAt.getTime()))/1000)} seconds before generating another response`
+        })
+      };
 
       let newMessage = new AIMessage({
         workspaceId,
@@ -95,7 +131,7 @@ const initializeWorkspaceSocket = (io, socket) => {
 
       await aiWorkspace.save();
 
-      const messages = await AIMessage.find({ workspaceId }).sort({ messageSentAt: -1 }).limit(10);
+      const messages = await AIMessage.find({ workspaceId }).sort({ messageSentAt: -1 }).limit(20);
       messages.reverse();
 
       const geminiMessages = messages.map((message) => ({
@@ -123,7 +159,10 @@ const initializeWorkspaceSocket = (io, socket) => {
 
         io.to(workspaceId).emit("responseGenerated", {
         message: savedResponse
-      })
+      });
+      aiUsage.count++;
+      aiUsage.lastPromptSentAt = today;
+      await aiUsage.save();
         }
       } catch(err) {
         console.log(err);
