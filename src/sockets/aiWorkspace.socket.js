@@ -86,6 +86,7 @@ const initializeWorkspaceSocket = (io, socket) => {
         aiUsage = await AIUsage.create({
           workspace: workspaceId,
           count: 0,
+          firstPromptSentAt: new Date(),
           lastPromptSentAt: new Date()
         });
         await aiUsage.save();
@@ -103,7 +104,7 @@ const initializeWorkspaceSocket = (io, socket) => {
         })
       };
 
-      if(aiUsage.lastPromptSentAt && (Date.now() - aiUsage.lastPromptSentAt.getTime()) < 10000) {
+      if(aiUsage.lastPromptSentAt && (aiUsage.lastPromptSentAt != aiUsage.firstPromptSentAt) && (Date.now() - aiUsage.lastPromptSentAt.getTime()) < 10000) {
         return socket.emit("workspaceError", {
           type: "generationCooldown",
           message: `Please wait ${Math.trunc((10000 - (Date.now() - aiUsage.lastPromptSentAt.getTime()))/1000)} seconds before generating another response`
