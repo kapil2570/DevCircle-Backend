@@ -46,7 +46,6 @@ const initializeWorkspaceSocket = (io, socket) => {
       aiWorkspace.currentDraft.text = text;
       aiWorkspace.currentDraft.updatedBy = loggedInUserId;
       const updatedAIWorkspace = await aiWorkspace.save();
-      console.log('updatedAIWorkspace', updatedAIWorkspace);
       io.to(workspaceId).emit("promptSynced", { text: updatedAIWorkspace.currentDraft.text, updatedBy: updatedAIWorkspace.currentDraft.updatedBy })
 
     } catch (err) {
@@ -73,6 +72,7 @@ const initializeWorkspaceSocket = (io, socket) => {
           message: "AI is already generating a response"
         });
       }
+
 
       let newMessage = new AIMessage({
         workspaceId,
@@ -108,6 +108,7 @@ const initializeWorkspaceSocket = (io, socket) => {
         submittedBy: loggedInUserId
       });
 
+
       try {
         const response = await generateResponse(geminiMessages);
 
@@ -125,6 +126,7 @@ const initializeWorkspaceSocket = (io, socket) => {
       })
         }
       } catch(err) {
+        console.log(err);
         return io.to(workspaceId).emit("aiGenerationError", { message: err.message });
       } finally {
         await AIWorkspace.findByIdAndUpdate(workspaceId, { isGenerating: false });

@@ -41,7 +41,7 @@ const removeOnlineUser = (io, socket) => {
     }
   }
 
-  console.log("Online Users:", onlineUsers);
+  // console.log("Online Users:", onlineUsers);
 };
 
 module.exports = {

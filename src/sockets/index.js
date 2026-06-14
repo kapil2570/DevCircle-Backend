@@ -25,7 +25,6 @@ const initializeSocket = (server) => {
   io.use(socketAuth);
 
   io.on("connection", (socket) => {
-    console.log("Socket Connected:", socket.id);
 
     // Handle online user tracking
     addOnlineUser(io, socket);
@@ -38,7 +37,6 @@ const initializeSocket = (server) => {
 
     // Disconnect cleanup
     socket.on("disconnect", () => {
-      console.log("Socket Disconnected:", socket.id);
 
       removeOnlineUser(io, socket);
     });

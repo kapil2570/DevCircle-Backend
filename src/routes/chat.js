@@ -4,6 +4,7 @@ const { Chat, Message } = require("../models/chat");
 const ConnectionRequest = require("../models/connectionRequest");
 const { onlineUsers } = require('../sockets/onlineUsers');
 const { AIWorkspace } = require("../models/aiWorkspace");
+const { generateResponse } = require("../config/gemini");
 
 const chatRouter = express.Router();
 
@@ -79,6 +80,15 @@ chatRouter.get("/chat/:chatId", userAuth, async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 });
+
+// chatRouter.get("/chat-test/test-ai", userAuth, async (req, res) => {
+//   try {
+//     const response = await generateResponse("Hi, how are you");
+//     res.json({message: response})
+//   } catch (err) {
+//     res.status(400).json({message: err.message})
+//   }
+// });
 
 
 

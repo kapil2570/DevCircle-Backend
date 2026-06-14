@@ -1,10 +1,10 @@
+require("dotenv").config();
 const express = require("express");
 const connectDB = require("./config/database");
 const cookieParser = require("cookie-parser");
 const cors = require('cors');
 const { initializeSocket } = require('./sockets');
 
-require("dotenv").config();
 
 const authRouter = require('./routes/auth');
 const profileRouter = require('./routes/profile');
