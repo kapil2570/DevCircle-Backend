@@ -17,7 +17,7 @@ const initializeWorkspaceSocket = (io, socket) => {
       }
       socket.currentWorkspaceId = workspaceId;
       socket.join(workspaceId);
-      const { participants, currentDraft, isGenerating, lastActivityDate } = aiWorkspace;
+      const { participants, currentDraft, isGenerating, lastActivityDate, currentEditor, editRequester } = aiWorkspace;
       const messages = await AIMessage.find({ workspaceId }).sort({ messageSentAt: 1 });
 
       socket.emit("workspaceStateSynced", { 
@@ -25,10 +25,41 @@ const initializeWorkspaceSocket = (io, socket) => {
         currentDraft,
         isGenerating,
         lastActivityDate,
-        messages
+        messages,
+        currentEditor,
+        editRequester
        })
     } catch (err) {
       console.log(err.message || "Something went wrong");
+    }
+  });
+
+  socket.on("editControlActivity", async ({ workspaceId }) => {
+    try {
+
+      if(!socket.currentWorkspaceId) return;
+
+      if(socket.currentWorkspaceId !== workspaceId) {
+        throw new Error("You don't have access to this workspace");
+      };
+
+      const aiWorkspace = await AIWorkspace.findById(workspaceId);
+      if(!aiWorkspace.currentEditor) {
+        aiWorkspace.currentEditor = loggedInUserId;
+      } else if(aiWorkspace.currentEditor.equals(loggedInUserId)) {
+        aiWorkspace.currentEditor = aiWorkspace.editRequester;
+        aiWorkspace.editRequester = null;
+      } else {
+        aiWorkspace.editRequester = loggedInUserId;
+      };
+      const updatedAIWorkspace = await aiWorkspace.save();
+
+      io.to(workspaceId).emit("editControlTransferred", { currentEditor: updatedAIWorkspace.currentEditor, editRequester: updatedAIWorkspace.editRequester });
+
+    } catch(err) {
+      return socket.emit("workspaceError", {
+          message: err.message
+      })
     }
   });
 
@@ -52,7 +83,9 @@ const initializeWorkspaceSocket = (io, socket) => {
       io.to(workspaceId).emit("promptSynced", { text: updatedAIWorkspace.currentDraft.text, updatedBy: updatedAIWorkspace.currentDraft.updatedBy })
 
     } catch (err) {
-      console.log(err.message || "Something went wrong");
+      return socket.emit("workspaceError", {
+          message: "You don't have access to this workspace"
+        });
     }
 
   });
@@ -132,6 +165,9 @@ const initializeWorkspaceSocket = (io, socket) => {
       };
       aiWorkspace.isGenerating = true;
 
+      aiWorkspace.currentEditor = null;
+      aiWorkspace.editRequester = null;
+
       await aiWorkspace.save();
 
       const messages = await AIMessage.find({ workspaceId }).sort({ messageSentAt: -1 }).limit(20);
@@ -146,7 +182,6 @@ const initializeWorkspaceSocket = (io, socket) => {
         isGenerating : true,
         submittedBy: loggedInUserId
       });
-
 
       try {
         const response = await generateResponse(geminiMessages);

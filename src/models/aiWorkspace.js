@@ -15,6 +15,14 @@ const aiWorkspaceSchema = new mongoose.Schema({
             default: null
         }
     },
+    currentEditor: {
+        type: mongoose.Schema.Types.ObjectId,
+        default: null
+    },
+    editRequester: {
+        type: mongoose.Schema.Types.ObjectId,
+        default: null
+    },
     isGenerating: {
         type: Boolean,
         default: false
