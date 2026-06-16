@@ -139,7 +139,8 @@ const initializeWorkspaceSocket = (io, socket) => {
         })
       };
 
-      if(aiUsage.lastPromptSentAt && (aiUsage.lastPromptSentAt != aiUsage.firstPromptSentAt) && (Date.now() - aiUsage.lastPromptSentAt.getTime()) < 10000) {
+      if(aiUsage.lastPromptSentAt && (Date.now() - aiUsage.lastPromptSentAt.getTime()) < 10000) {
+        console.log(Date.now() - aiUsage.lastPromptSentAt.getTime());
         return socket.emit("workspaceError", {
           type: "generationCooldown",
           message: `Please wait ${Math.trunc((10000 - (Date.now() - aiUsage.lastPromptSentAt.getTime()))/1000)} seconds before generating another response`
@@ -168,7 +169,9 @@ const initializeWorkspaceSocket = (io, socket) => {
       aiWorkspace.currentEditor = null;
       aiWorkspace.editRequester = null;
 
-      await aiWorkspace.save();
+      const updatedAIWorkspace = await aiWorkspace.save();
+
+      io.to(workspaceId).emit("editControlTransferred", { currentEditor: updatedAIWorkspace.currentEditor, editRequester: updatedAIWorkspace.editRequester });
 
       const messages = await AIMessage.find({ workspaceId }).sort({ messageSentAt: -1 }).limit(20);
       messages.reverse();
