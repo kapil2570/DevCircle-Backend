@@ -16,6 +16,7 @@ const aiUsageSchema = new mongoose.Schema({
     }
 });
 
+
 const aiUsageModel = new mongoose.model("AIUsage", aiUsageSchema);
 
 module.exports = { AIUsage: aiUsageModel };

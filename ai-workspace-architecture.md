@@ -53,3 +53,36 @@
 - Unlock workspace
 - Broadcast generated response
 - Clear shared draft
+
+
+
+
+
+
+
+
+
+## Assessment Schema - 
+
+- prompt -> String
+- createdBy -> ObjectId
+- status -> String(ready | submitted | evaluated)
+- participants -> Array of objects - { participant -> ObjectId, overallScore -> Number, overallFeedback -> String }
+
+
+## Questions Schema -
+
+- assessmentId -> ObjectId
+- questionNumber -> Number
+- questionStatement -> String
+- questionType -> String(mcq | descriptive)
+- Options -> Array of Strings
+
+## Answers Schema -
+
+- assessmentId -> ObjectId
+- questionId -> ObjectId
+- answeredBy -> ObjectId
+- answerText -> String
+- score -> Number
+- feedback -> String

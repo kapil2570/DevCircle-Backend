@@ -11,6 +11,7 @@ const profileRouter = require('./routes/profile');
 const requestRouter = require('./routes/request');
 const userRouter = require('./routes/user');
 const chatRouter = require('./routes/chat');
+const assessmentRouter = require('./routes/assessment');
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use("/", profileRouter);
 app.use("/", requestRouter);
 app.use("/", userRouter);
 app.use("/", chatRouter);
+app.use("/", assessmentRouter);
 
 
 const http = require('http');

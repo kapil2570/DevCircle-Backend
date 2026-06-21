@@ -85,6 +85,14 @@ const userSchema = new mongoose.Schema({
                 throw new Error("Max 250 characters are allowed in career goals field");
             }
         }
+    },
+    aiUsage: {
+        type: Number,
+        default: 0
+    },
+    lastPromptSentAt: {
+        type: Date,
+        default: null
     }
 },
 {
