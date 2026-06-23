@@ -26,14 +26,14 @@ assessmentRouter.post("/assessment/generate", userAuth, async (req, res) => {
   const userPrompt = req.body.prompt;
 
   try {
-    if (!userPrompt || userPrompt.length > 1000) {
+    if (!userPrompt || userPrompt.length > 500) {
       throw new Error(
-        "Prompt cannot be empty or more than 1000 characters long",
+        "Prompt cannot be empty or more than 500 characters long",
       );
     }
 
     let today = new Date();
-    if (user.lastPromptSentAt.toDateString() !== today.toDateString()) {
+    if (user.lastPromptSentAt?.toDateString() !== today.toDateString()) {
       user.lastPromptSentAt = today;
       user.aiUsage = 0;
       await user.save();
@@ -106,6 +106,53 @@ assessmentRouter.get("/assessment/:id", userAuth, async (req, res) => {
     }
 });
 
+assessmentRouter.post("/assessment/save/:id", userAuth, async (req, res) => {
+    try {
+
+        const loggedInUserId = req.user._id;
+        const assessmentId = req.params.id;
+
+        const answers = req.body?.answers;
+
+        const assessment = await Assessment.findOne({ _id: assessmentId, participants: loggedInUserId });
+        if(!assessment) {
+            throw new Error("You don't have access to this assessment");
+        };
+
+        if(!(assessment.status === "ready")) {
+            throw new Error("This assessment is already submitted");
+        };
+
+        if(!Array.isArray(answers) || answers.length === 0) {
+            throw new Error("Invalid answers submission");
+        };
+
+        const isAnswersValid = answers.some((answer) => answer.answerText && answer.answerText.length <= 1000);
+
+        if(!isAnswersValid) {
+            throw new Error("Please answer at least one question and ensure no answer exceeds 1000 characters.");
+        };
+ 
+        
+        const answerMap = new Map(answers.map((answer) => [answer.questionNumber, answer]));
+
+        assessment.questions.forEach((question) => {
+            const answeredQuestion = answerMap.get(question.questionNumber);
+            question.answeredBy = answeredQuestion?.answeredBy || null;
+            question.answerText = answeredQuestion?.answerText || "No answer provided";
+            question.score = null;
+            question.feedback = "";
+        });
+
+        await assessment.save();
+
+        return res.json({ message: "Saved the answers successfully",  assessment: assessment.toJSON()});
+
+    } catch(err) {
+        res.status(400).json({message: err.message});
+    }
+})
+
 assessmentRouter.post("/assessment/submit/:id", userAuth, async (req, res) => {
     try {
 
@@ -127,12 +174,12 @@ assessmentRouter.post("/assessment/submit/:id", userAuth, async (req, res) => {
             throw new Error("Invalid answers submission");
         };
 
-        const isAnswersValid = answers.some((answer) => answer.answerText);
+        const isAnswersValid = answers.some((answer) => answer.answerText && answer.answerText.length <= 1000);
 
         if(!isAnswersValid) {
-            throw new Error("None of the questions are answered");
+            throw new Error("Please answer at least one question and ensure no answer exceeds 1000 characters.");
         };
-
+ 
         
         const answerMap = new Map(answers.map((answer) => [answer.questionNumber, answer]));
 
