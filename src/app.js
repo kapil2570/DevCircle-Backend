@@ -12,6 +12,7 @@ const requestRouter = require('./routes/request');
 const userRouter = require('./routes/user');
 const chatRouter = require('./routes/chat');
 const assessmentRouter = require('./routes/assessment');
+const dashboardRouter = require('./routes/dashboard');
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.use("/", requestRouter);
 app.use("/", userRouter);
 app.use("/", chatRouter);
 app.use("/", assessmentRouter);
+app.use("/", dashboardRouter);
 
 
 const http = require('http');
