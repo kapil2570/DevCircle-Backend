@@ -1,7 +1,7 @@
 {
-  "name": "devcircle---backend",
+  "name": "devcircle--backend",
   "version": "1.0.0",
-  "description": "Tinder for Devs",
+  "description": "AI-Powered Developer Collaboration Platform Backend",
   "main": "index.js",
   "scripts": {
     "start": "node src/app",

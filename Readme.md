@@ -2,168 +2,209 @@
 
 <h1 align="center">DevCircle Backend</h1>
 
-<p align="center">
-<strong>Node.js Backend powering Developer Networking, Real-Time Communication, Collaborative AI Workspaces and AI Assessments</strong>
-</p>
+<p align="center"><strong>Backend for the AI‑Powered Developer Collaboration Platform</strong></p>
 
 <p align="center">
-Built with Express.js • MongoDB • Socket.IO • Google Gemini
+Node.js • Express.js • MongoDB • Socket.IO • Google Gemini
 </p>
 
 <p align="center">
 <a href="https://www.devcircle.co.in">
-  <img src="https://img.shields.io/badge/🌐%20Live%20Demo-www.devcircle.co.in-0A66C2?style=for-the-badge" />
+<img src="https://img.shields.io/badge/🌐%20Live%20Demo-www.devcircle.co.in-0A66C2?style=for-the-badge">
 </a>
 </p>
 
 <p align="center">
-<img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white"/>
-<img src="https://img.shields.io/badge/Express-black?style=for-the-badge&logo=express"/>
-<img src="https://img.shields.io/badge/MongoDB-13AA52?style=for-the-badge&logo=mongodb&logoColor=white"/>
-<img src="https://img.shields.io/badge/Socket.IO-black?style=for-the-badge&logo=socketdotio"/>
+<img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white">
+<img src="https://img.shields.io/badge/Express-black?style=for-the-badge&logo=express">
+<img src="https://img.shields.io/badge/MongoDB-13AA52?style=for-the-badge&logo=mongodb&logoColor=white">
+<img src="https://img.shields.io/badge/Socket.IO-black?style=for-the-badge&logo=socketdotio">
 <br>
-<img src="https://img.shields.io/badge/Google%20Gemini-4285F4?style=for-the-badge&logo=google&logoColor=white"/>
-<img src="https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=jsonwebtokens"/>
-<img src="https://img.shields.io/badge/AWS-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white"/>
-<img src="https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white"/>
+<img src="https://img.shields.io/badge/Google%20Gemini-4285F4?style=for-the-badge&logo=google&logoColor=white">
+<img src="https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=jsonwebtokens">
+<img src="https://img.shields.io/badge/AWS-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white">
+<img src="https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white">
 </p>
 
 ---
 
 # 🚀 Overview
 
-This repository contains the backend powering **DevCircle**, an AI-powered developer collaboration platform.
+This repository contains the backend powering **DevCircle**, an AI-powered developer collaboration platform that combines developer networking, real-time communication, collaborative AI workspaces, and AI-powered technical assessments.
 
-The backend exposes REST APIs, manages JWT authentication, handles Socket.IO communication, integrates with Google Gemini, persists application data in MongoDB, and coordinates collaborative AI workspaces and AI-powered technical assessments.
+The backend is responsible for:
 
----
-
-# ✨ Core Responsibilities
-
-- JWT Authentication & Authorization
-- REST API Development
-- Developer Networking
-- Connection Management
-- Real-Time Chat
-- Socket.IO Event Management
-- Collaborative AI Workspace
-- AI Assessment Generation
-- AI Answer Evaluation
-- Dashboard Data Aggregation
-- MongoDB Persistence
-- Google Gemini Integration
+- JWT & Cookie based authentication
+- REST API layer
+- Real-time communication using Socket.IO
+- Google Gemini integration
+- MongoDB persistence
+- Collaborative AI workspace coordination
+- AI assessment generation & evaluation
+- Dashboard analytics
 
 ---
 
-# 🏗 Backend Architecture
+# ✨ Core Features
 
-```mermaid
-flowchart LR
-Client["React Frontend"]
-Client -->|REST APIs| Express["Express Server"]
-Client <-->|Socket.IO| Express
-Express --> Auth["JWT Authentication"]
-Express --> Mongo[(MongoDB)]
-Express --> Gemini["Google Gemini API"]
-```
+## 🔐 Authentication
 
----
+- JWT authentication
+- HTTP-only cookies
+- Protected REST APIs
+- Socket authentication middleware
 
-# 🔐 Authentication Flow
+## 👥 Developer Networking
 
-```text
-User Login
-    ↓
-Verify Credentials
-    ↓
-Generate JWT
-    ↓
-HTTP Only Cookie
-    ↓
-Protected APIs & Socket Authentication
-```
+- User discovery
+- Profile management
+- Connection request lifecycle
 
----
-
-# 💬 Real-Time Communication
+## 💬 Real-Time Messaging
 
 - One-to-one messaging
-- Online/offline presence
-- Room-based messaging
-- Multi-device support
-- Collaborative workspace synchronization
+- Room-based Socket.IO architecture
+- Online/offline tracking
+- Persistent chat history
 
----
+## 🤝 Collaborative AI Workspace
 
-# 🤝 Collaborative AI Workspace
+The backend coordinates a synchronized AI workspace for two connected developers.
 
-## Features
+### Features
 
 - Workspace authorization
+- Shared draft persistence
 - Controlled edit ownership
-- Request/Approval workflow
-- Shared drafts
-- Prompt synchronization
-- Generation locking
-- Conversation persistence
+- Edit request / approval workflow
+- Live prompt synchronization
+- AI generation locking
+- Conversation history restoration
 - Context-aware Gemini conversations
 
-## Workflow
+### Request Flow
 
 ```text
 Join Workspace
       ↓
 Authorize User
       ↓
-Sync Workspace State
+Join Socket Room
       ↓
-Request Edit Access
-      ↓
-Grant Ownership
+Edit Ownership
       ↓
 Live Prompt Sync
       ↓
-Submit Prompt
+Prompt Submission
       ↓
-Retrieve Conversation History
+Retrieve AI History
       ↓
-Generate Gemini Response
+Gemini Response
       ↓
-Persist & Broadcast
+Persist Response
+      ↓
+Broadcast To Participants
 ```
 
----
+## 🧠 AI Assessment Engine
 
-# 🧠 AI Assessment Engine
+Generate customized assessments from natural-language prompts.
+
+Example:
+
+> Practice advanced React interview questions.
+
+Pipeline:
 
 ```text
 Prompt
-  ↓
-Generate Assessment
-  ↓
-Submit Answers
-  ↓
+ ↓
+Assessment Generation
+ ↓
+Assessment Stored
+ ↓
+Answer Submission
+ ↓
 AI Evaluation
-  ↓
-Per-question Scores
-  ↓
+ ↓
+Per Question Score
+ ↓
 Overall Feedback
-  ↓
+ ↓
 Dashboard Analytics
+```
+
+Every response receives:
+
+- Question score (0–10)
+- Detailed feedback
+- Overall score
+- Improvement recommendations
+
+---
+
+# 🏗 Architecture
+
+```mermaid
+flowchart LR
+
+A[React Frontend]
+
+A -->|REST APIs| B(Express)
+
+A <-->|Socket.IO| B
+
+B --> C[(MongoDB)]
+
+B --> D[Google Gemini]
+
+B --> E[Cloudinary]
 ```
 
 ---
 
-# 🗄 Database Collections
+# 📂 Project Structure
 
-- Users
-- Connection Requests
-- Conversations
-- Messages
-- AI Workspaces
-- AI Messages
-- Assessments
-- Assessment Responses
+```text
+src
+├── app.js
+├── routes
+│   ├── auth.js
+│   ├── user.js
+│   ├── profile.js
+│   ├── request.js
+│   ├── chat.js
+│   ├── assessment.js
+│   └── dashboard.js
+├── sockets
+│   ├── index.js
+│   ├── chat.socket.js
+│   ├── aiWorkspace.socket.js
+│   └── onlineUsers.js
+├── models
+│   ├── user.js
+│   ├── chat.js
+│   ├── connectionRequest.js
+│   ├── assessment.js
+│   ├── aiWorkspace.js
+│   └── aiUsage.js
+├── middlewares
+├── config
+└── utils
+```
+
+---
+
+# 🗄 Database Models
+
+| Model | Responsibility |
+|-------|----------------|
+| User | Authentication, developer profile and metadata |
+| ConnectionRequest | Tracks connection lifecycle |
+| Chat | Conversations and messages |
+| AIWorkspace | Shared workspace state and generation lock |
+| AIUsage | AI usage tracking |
+| Assessment | Generated assessments, responses and evaluation |
 
 ---
 
@@ -172,34 +213,53 @@ Dashboard Analytics
 ```env
 PORT=
 MONGODB_URI=
-JWT_SECRET=
-GEMINI_API_KEY=
-FRONTEND_URL=
 CLOUDINARY_CLOUD_NAME=
 CLOUDINARY_API_KEY=
 CLOUDINARY_API_SECRET=
+JWT_SECRET=
+CLIENT_URL=
+NODE_ENV=
+GEMINI_API_KEY=
 ```
 
 ---
 
-# 🚀 Local Setup
+# 🚀 Running Locally
 
 ```bash
 git clone https://github.com/kapil2570/DevCircle-Backend.git
+
 cd DevCircle-Backend
+
 npm install
-npm start
+
+npm run dev
+```
+
+---
+
+# 📦 Available Scripts
+
+```bash
+npm run dev     # Start with nodemon
+npm start       # Production
 ```
 
 ---
 
 # 🔗 Related Repositories
 
-Frontend: https://github.com/kapil2570/DevCircle-Frontend
+**Frontend**
 
-Backend: https://github.com/kapil2570/DevCircle-Backend
+https://github.com/kapil2570/DevCircle-Frontend
 
-Live: https://www.devcircle.co.in
+**Backend**
+
+https://github.com/kapil2570/DevCircle-Backend
+
+**Live Platform**
+
+https://www.devcircle.co.in
 
 ---
 
@@ -207,9 +267,9 @@ Live: https://www.devcircle.co.in
 
 **Kapil Sahu**
 
-- LinkedIn: https://www.linkedin.com/in/kapil-sahu1911/
 - GitHub: https://github.com/kapil2570
+- LinkedIn: https://www.linkedin.com/in/kapil-sahu1911/
 
 ---
 
-⭐ If you found this project interesting, consider giving the repository a star.
+If you found this project interesting, consider giving it a ⭐.
