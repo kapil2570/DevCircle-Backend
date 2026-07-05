@@ -24,7 +24,7 @@ const initializeChatSocket = (io, socket) => {
       io.to(chatId).emit("messageReceived", newMessage);
 
     } catch (err) {
-      console.log(err.message || "Error sending message");
+      console.log(err || "Error sending message");
     }
   });
 };

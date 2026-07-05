@@ -139,12 +139,12 @@ const initializeWorkspaceSocket = (io, socket) => {
         })
       };
 
-      if(aiUsage.lastPromptSentAt && (Date.now() - aiUsage.lastPromptSentAt.getTime()) < 10000) {
+      if(aiUsage.lastPromptSentAt && aiUsage.count > 0 && (Date.now() - aiUsage.lastPromptSentAt.getTime()) < 10000) {
         console.log(Date.now() - aiUsage.lastPromptSentAt.getTime());
         return socket.emit("workspaceError", {
           type: "generationCooldown",
           message: `Please wait ${Math.trunc((10000 - (Date.now() - aiUsage.lastPromptSentAt.getTime()))/1000)} seconds before generating another response`
-        })
+        });
       };
 
       let newMessage = new AIMessage({

@@ -32,7 +32,7 @@ dashboardRouter.get("/dashboard", userAuth, async (req,res) => {
         const totalSubmittedAssessments = submittedAssessments.length;
         if(totalSubmittedAssessments) {
             dashboardData.metrics.totalCompleted = submittedAssessments.length;
-            dashboardData.metrics.avgScore = totalScore/totalSubmittedAssessments;
+            dashboardData.metrics.avgScore = Number((totalScore/totalSubmittedAssessments).toFixed(1));
         }
 
         dashboardData.metrics.highestScore = submittedAssessments.length > 0 ? Math.max(...submittedAssessments.map((assessment) => assessment.overallScore)) : 0;
