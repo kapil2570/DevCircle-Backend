@@ -8,7 +8,7 @@ const dashboardRouter = express.Router();
 dashboardRouter.get("/dashboard", userAuth, async (req,res) => {
     const loggedInUserId = req.user._id;
     try {
-
+        
         const dashboardData = {
             metrics : {
                 avgScore: 0,
@@ -19,23 +19,28 @@ dashboardRouter.get("/dashboard", userAuth, async (req,res) => {
             performanceTrend : [],
             recentAssessments : []
         }
-
-        const myAssessments = await Assessment.find({ participants: loggedInUserId }).sort({ updatedAt: -1 }).select("overallScore prompt createdBy status updatedAt").lean();
-
+        
+        const myAssessments = await Assessment.find({ participants: loggedInUserId }).sort({ updatedAt: -1 }).select("questions overallScore prompt createdBy status updatedAt").lean();
+        
         const pendingAssessments = myAssessments.filter((assessment) => assessment.status === "ready");
         const submittedAssessments = myAssessments.filter((assessment) => assessment.status === "submitted");
 
-        const totalScore = submittedAssessments.reduce((accumulator, currentAssessment) => {
-            return accumulator + currentAssessment.overallScore;
+        let highestScore = 0;
+        
+        const totalPercentageScore = submittedAssessments.reduce((accumulator, currentAssessment) => {
+            if(currentAssessment.questions.length === 0) return accumulator;
+            const obtainedScore = currentAssessment.overallScore;
+            const maxScore = currentAssessment.questions.length * 10;
+            const percentageScore = (obtainedScore * 100) / maxScore;
+            highestScore = Math.max(highestScore, percentageScore);
+            return accumulator + percentageScore;
         }, 0);
 
         const totalSubmittedAssessments = submittedAssessments.length;
-        if(totalSubmittedAssessments) {
-            dashboardData.metrics.totalCompleted = submittedAssessments.length;
-            dashboardData.metrics.avgScore = Number((totalScore/totalSubmittedAssessments).toFixed(1));
-        }
+        dashboardData.metrics.totalCompleted = submittedAssessments.length;
+        dashboardData.metrics.avgScore = totalSubmittedAssessments > 0 ? Number((totalPercentageScore/totalSubmittedAssessments).toFixed(1)) : 0;
 
-        dashboardData.metrics.highestScore = submittedAssessments.length > 0 ? Math.max(...submittedAssessments.map((assessment) => assessment.overallScore)) : 0;
+        dashboardData.metrics.highestScore = highestScore;
 
         dashboardData.metrics.pending = pendingAssessments.length;
 

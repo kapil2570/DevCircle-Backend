@@ -26,7 +26,7 @@ assessmentRouter.post("/assessment/generate", userAuth, async (req, res) => {
   const userPrompt = req.body.prompt;
 
   try {
-    if (!userPrompt || userPrompt.length > 500) {
+    if (!userPrompt?.trim() || userPrompt.length > 500) {
       throw new Error(
         "Prompt cannot be empty or more than 500 characters long",
       );
@@ -77,7 +77,7 @@ assessmentRouter.post("/assessment/generate", userAuth, async (req, res) => {
 
     const savedAssessment = await assessment.save();
 
-    const { questions: questionsList, ...assessmentMetadata } = assessment.toJSON();
+    const { questions: questionsList, ...assessmentMetadata } = savedAssessment.toJSON();
 
 
     return res.json({ assessment: assessmentMetadata });
@@ -174,7 +174,8 @@ assessmentRouter.post("/assessment/submit/:id", userAuth, async (req, res) => {
             throw new Error("Invalid answers submission");
         };
 
-        const isAnswersValid = answers.some((answer) => answer.answerText && answer.answerText.length <= 1000);
+        const isAnswersValid = answers.some((answer) => typeof answer.answerText === 'string' && answer.answerText.length > 0)
+            && !(answers.some((answer) => typeof answer.answerText === 'string' && answer.answerText.length > 1000));
 
         if(!isAnswersValid) {
             throw new Error("Please answer at least one question and ensure no answer exceeds 1000 characters.");
@@ -195,7 +196,9 @@ assessmentRouter.post("/assessment/submit/:id", userAuth, async (req, res) => {
 
         const questionsForEvaluation = assessment.toJSON().questions;
         const aiEvaluationInput = JSON.stringify(questionsForEvaluation, null, 2);
+
         const evaluatedAnswersText = await evaluateAnswers(aiEvaluationInput);
+
         const evaluatedAnswers = JSON.parse(evaluatedAnswersText);
         if(!evaluatedAnswers.overallScore && evaluatedAnswers.overallScore !== 0) {
             throw new Error("Invalid evaluated response");
@@ -209,13 +212,16 @@ assessmentRouter.post("/assessment/submit/:id", userAuth, async (req, res) => {
 
         const evaluatedAnswersMap = new Map(evaluatedAnswers.questions.map((question) => [question.questionNumber, question]));
 
+        let totalScore = 0;
+
         assessment.questions.forEach((question) => {
             const evaluatedAnswer = evaluatedAnswersMap.get(question.questionNumber);
             question.score = evaluatedAnswer.score;
             question.feedback = evaluatedAnswer.feedback;
+            totalScore += evaluatedAnswer.score;
         });
 
-        assessment.overallScore = evaluatedAnswers.overallScore;
+        assessment.overallScore = totalScore;
         assessment.overallFeedback.strengths = evaluatedAnswers.overallFeedback.strengths;
         assessment.overallFeedback.improvements = evaluatedAnswers.overallFeedback.improvements;
 
