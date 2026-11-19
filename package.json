@@ -27,6 +27,7 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.1.1",
     "multer": "^2.0.2",
+    "openai": "^7.60.0",
     "socket.io": "^4.8.3",
     "validator": "^13.15.26"
   }

@@ -1,6 +1,6 @@
 const express = require("express");
 const { userAuth } = require("../middlewares/auth");
-const { generateQuestions, evaluateAnswers } = require("../config/gemini");
+const { generateQuestions, evaluateAnswers } = require("../config/ai");
 const user = require("../models/user");
 const { Assessment } = require("../models/assessment");
 
@@ -46,7 +46,7 @@ assessmentRouter.post("/assessment/generate", userAuth, async (req, res) => {
     };
 
     let responseText = await generateQuestions(userPrompt);
-    response = JSON.parse(responseText);
+    const response = JSON.parse(responseText);
     user.aiUsage++;
     user.lastPromptSentAt = today;
     await user.save();

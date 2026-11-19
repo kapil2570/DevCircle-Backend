@@ -1,4 +1,4 @@
-const { generateResponse } = require('../config/gemini');
+const { generateResponse } = require('../config/ai');
 const { AIUsage } = require('../models/aiUsage');
 const { AIWorkspace, AIMessage } = require('../models/aiWorkspace');
 

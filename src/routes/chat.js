@@ -4,7 +4,7 @@ const { Chat, Message } = require("../models/chat");
 const ConnectionRequest = require("../models/connectionRequest");
 const { onlineUsers } = require('../sockets/onlineUsers');
 const { AIWorkspace } = require("../models/aiWorkspace");
-const { generateResponse } = require("../config/gemini");
+const { generateResponse } = require("../config/ai");
 
 const chatRouter = express.Router();
 
